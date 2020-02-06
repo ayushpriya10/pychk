@@ -132,3 +132,5 @@ dmypy.json
 requirements.txt
 insecure.json
 insecure_full.json
+.vscode/
+TODOs.todo

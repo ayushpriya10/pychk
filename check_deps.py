@@ -3,14 +3,15 @@ from fetch_resources import fetch_jsons
 
 insecure_deps, insecure_deps_full = fetch_jsons()
 
-def check_dependency(dep_name, dep_version=-99999, verbose=False):
+def check_dependency(dep_name, dep_version='', verbose=False):
 
     output_set = set()
 
-    if dep_version == -99999:
-        print(f'[-] Please specify version to check if "{dep_name}" is vulnerable.')
-        return
+    if dep_version == '':
+        print(f'[ERR] Please specify version to check if "{dep_name}" is vulnerable.')
+        return None
 
+    print()
     if dep_name in insecure_deps:
         vuln_versions = insecure_deps[dep_name]
 
@@ -40,6 +41,8 @@ def check_dependency(dep_name, dep_version=-99999, verbose=False):
     
     for output in output_set:
         print(output)
+    
+    return output_set
 
 
 if __name__ == "__main__":
