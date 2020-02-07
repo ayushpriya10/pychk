@@ -14,7 +14,6 @@ def fetch_jsons(verbose=False):
         print('[INFO] Fetched list of Security Advisories')
 
         print('[INFO] Fetch complete.')
-
         return insecure_deps, insecure_deps_full
     
     except:

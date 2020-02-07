@@ -8,10 +8,6 @@ def find_advisory(dep_name, version):
 
     for advisory in advisory_list:
         if advisory['v'] == version:
-            print({
-                'advisory': advisory['advisory'],
-                'cve': advisory['cve']
-            })
             return {
                 'advisory': advisory['advisory'],
                 'cve': advisory['cve']
@@ -26,7 +22,6 @@ def check_dependency(dep_name, dep_version='', verbose=False):
         print(f'[ERR] Please specify version to check if "{dep_name}" is vulnerable.')
         return None
 
-    print()
     if dep_name in insecure_deps:
         vuln_versions = insecure_deps[dep_name]
 
@@ -36,32 +31,29 @@ def check_dependency(dep_name, dep_version='', verbose=False):
             for vuln_ver in ver_list:
                 if '<' in vuln_ver and '=' not in vuln_ver:
                     if version.parse(dep_version) < version.parse(vuln_ver[1:]):
-                        output_set.add(f'[!] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
+                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
                         find_advisory(dep_name, ver)
 
                 if '<=' in vuln_ver:
                     if version.parse(dep_version) <= version.parse(vuln_ver[2:]):
-                        output_set.add(f'[!] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
+                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
                         find_advisory(dep_name, ver)
                 
                 if '>' in vuln_ver and '=' not in vuln_ver:
                     if version.parse(dep_version) > version.parse(vuln_ver[1:]):
-                        output_set.add(f'[!] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
+                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
                         find_advisory(dep_name, ver)
                 
                 if '>=' in vuln_ver:
                     if version.parse(dep_version) >= version.parse(vuln_ver[2:]):
-                        output_set.add(f'[!] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
+                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
                         find_advisory(dep_name, ver)
                 
                 if '==' in vuln_ver:
                     if version.parse(dep_version) == version.parse(vuln_ver[2:]):
-                        output_set.add(f'[!] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
+                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
                         find_advisory(dep_name, ver)
-    
-    for output in output_set:
-        print(output)
-    
+
     return output_set
 
 
