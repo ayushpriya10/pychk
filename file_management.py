@@ -18,7 +18,7 @@ def read_from_requirement(path='requirements.txt'):
             for dependency in copy_of_requirements:
                 if len(dependency) == 1:
                     if '>=' in dependency[0] or '<=' in dependency[0]:
-                        print(f'[MSG] Please specify exact version to check by replacing \'<=\' or \'>=\' with \'==\' for {dependency}')
+                        print(f'[MSG] Please specify exact version to check by replacing \'<=\' or \'>=\' with \'==\' for {dependency}.')
                         requirements.remove(dependency)
                         continue
 
@@ -30,7 +30,6 @@ def read_from_requirement(path='requirements.txt'):
 
                         else:
                             dependency = [dependency[0][:dependency[0].index('#')].strip()]
-                            print(depe)
 
                     requirements[requirements.index(dependency)] += ['']
 
@@ -45,7 +44,7 @@ def read_from_requirement(path='requirements.txt'):
                         version = dependency[1].split('#')[0].strip()
                         requirements.remove(dependency)
                         dependency = [dependency[0], version]
-                        requirements += dependency
+                        requirements += [dependency]
 
         return requirements
     

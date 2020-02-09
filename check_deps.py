@@ -10,20 +10,39 @@ def find_advisory(dep_name, version):
         if advisory['v'] == version:
             return {
                 'advisory': advisory['advisory'],
-                'cve': advisory['cve']
+                'cve': advisory['cve'],
+                'vulnerable versions': version
             }
 
-def check_dependency(dep_name, dep_version='', verbose=False):
+def check_dependency(dep_name, dep_version=''):
+
+    '''ADVISORY STRUCTURE:
+        [
+            {
+                'Dependency Name':[
+                    {
+                        'Advisory': <Advisory Value>,
+                        'Vulnerable Version': <Version Value>
+                    }, ...
+                ],
+                'Dependency Version': <Version Value>
+            }, ...
+        ]
+    '''
 
     output_set = set()
-    advisories = dict()
+    full_output = dict()
 
     if dep_version == '':
         print(f'[ERR] Please specify version to check if "{dep_name}" is vulnerable.')
         return None
-
+    
     if dep_name in insecure_deps:
         vuln_versions = insecure_deps[dep_name]
+        full_output = {
+            dep_name: list(),
+            "version": dep_version
+        }
 
         for ver in vuln_versions:
             ver_list = [i.strip() for i in ver.split(',')]
@@ -31,30 +50,41 @@ def check_dependency(dep_name, dep_version='', verbose=False):
             for vuln_ver in ver_list:
                 if '<' in vuln_ver and '=' not in vuln_ver:
                     if version.parse(dep_version) < version.parse(vuln_ver[1:]):
-                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
-                        find_advisory(dep_name, ver)
+                        output_set.add((dep_name, dep_version, vuln_ver))
+                        advisory = find_advisory(dep_name, ver)
+                        full_output[dep_name] += [advisory]
 
                 if '<=' in vuln_ver:
                     if version.parse(dep_version) <= version.parse(vuln_ver[2:]):
-                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
-                        find_advisory(dep_name, ver)
+                        output_set.add((dep_name, dep_version, vuln_ver))
+                        advisory = find_advisory(dep_name, ver)
+                        full_output[dep_name] += [advisory]
                 
                 if '>' in vuln_ver and '=' not in vuln_ver:
                     if version.parse(dep_version) > version.parse(vuln_ver[1:]):
-                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
-                        find_advisory(dep_name, ver)
+                        output_set.add((dep_name, dep_version, vuln_ver))
+                        advisory = find_advisory(dep_name, ver)
+                        full_output[dep_name] += [advisory]
                 
                 if '>=' in vuln_ver:
                     if version.parse(dep_version) >= version.parse(vuln_ver[2:]):
-                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
-                        find_advisory(dep_name, ver)
+                        output_set.add((dep_name, dep_version, vuln_ver))
+                        advisory = find_advisory(dep_name, ver)
+                        full_output[dep_name] += [advisory]
                 
                 if '==' in vuln_ver:
                     if version.parse(dep_version) == version.parse(vuln_ver[2:]):
-                        output_set.add(f'[ALRT] {dep_name}:{dep_version} is Vulnerable ({vuln_ver})')
-                        find_advisory(dep_name, ver)
+                        output_set.add((dep_name, dep_version, vuln_ver))
+                        advisory = find_advisory(dep_name, ver)
+                        full_output[dep_name] += [advisory]
+        
+        while None in full_output[dep_name]:
+            full_output[dep_name].remove(None)
 
-    return output_set
+    if full_output == {}:
+        return (output_set, None)
+
+    return (output_set, full_output)
 
 
 if __name__ == "__main__":

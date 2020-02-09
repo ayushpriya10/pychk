@@ -3,7 +3,7 @@ import requests
 import sys
 
 
-def fetch_jsons(verbose=False):
+def fetch_jsons(json_output=False):
     print('[INFO] Fetching latest resource files.')
 
     try:
