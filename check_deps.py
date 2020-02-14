@@ -11,7 +11,7 @@ def find_advisory(dep_name, version):
             return {
                 'advisory': advisory['advisory'],
                 'cve': advisory['cve'],
-                'vulnerable versions': version
+                'vulnerable_versions': version
             }
 
 def compare_versions(vuln_ver, dep_version):
@@ -43,7 +43,8 @@ def check_dependency(dep_name, dep_version=''):
     ADVISORY STRUCTURE:
         [
             {
-                'Dependency Name':[
+                'Dependency Name':<Package Name>
+                'Advisory List':[
                     {
                         'Advisory': <Advisory Value>,
                         'Vulnerable Version': <Version Value>
@@ -62,10 +63,14 @@ def check_dependency(dep_name, dep_version=''):
         return None
     
     if dep_name in insecure_deps:
+        # full_output['Dependency Name'] = dep_name
+        # full_output['Advisory List'] = list()
+        # print(full_output)
         vuln_versions = insecure_deps[dep_name]
         full_output = {
-            dep_name: list(),
-            "version": dep_version
+            'package_name': dep_name,
+            'advisory_list': list(),
+            "package_version": dep_version
         }
 
         for ver in vuln_versions:
@@ -77,19 +82,20 @@ def check_dependency(dep_name, dep_version=''):
                     if compare_versions(vuln_ver, dep_version):
                         output_set.add((dep_name, dep_version, vuln_ver))
                         advisory = find_advisory(dep_name, ver)
-                        full_output[dep_name] += [advisory]
+                        # print(full_output)
+                        full_output['advisory_list'] += [advisory]
 
                 if len(ver_list) == 2:
                     if compare_versions(ver_list[0], dep_version) and compare_versions(ver_list[1], dep_version):
                         output_set.add((dep_name, dep_version, vuln_ver))
                         advisory = find_advisory(dep_name, ver)
-                        full_output[dep_name] += [advisory]
+                        full_output['advisory_list'] += [advisory]
                         break
         
-        while None in full_output[dep_name]:
-            full_output[dep_name].remove(None)
+        while None in full_output['advisory_list']:
+            full_output['advisory_list'].remove(None)
     
-    if full_output == {} or full_output[dep_name] == []:
+    if full_output == {} or full_output['advisory_list'] == []:
         return (output_set, None)
 
     return (output_set, full_output)
