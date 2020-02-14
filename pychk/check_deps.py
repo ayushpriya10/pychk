@@ -1,7 +1,7 @@
 from packaging import version
-from fetch_resources import fetch_jsons
+from . import fetch_resources 
 
-insecure_deps, insecure_deps_full = fetch_jsons()
+insecure_deps, insecure_deps_full = fetch_resources.fetch_jsons()
 
 def find_advisory(dep_name, version):
     advisory_list = insecure_deps_full[dep_name]

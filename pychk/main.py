@@ -1,13 +1,13 @@
 import json
 import pprint
 
-import custom_parser
+from pychk.custom_parser import Parser
 
 def scan(path, json_output=False, out_file=None):
-    from file_management import read_from_requirement
+    from pychk.file_management import read_from_requirement
     requirements = read_from_requirement(path)
 
-    from check_deps import check_dependency
+    from pychk.check_deps import check_dependency
 
     complete_advisory = list()
     for req in requirements:
@@ -32,10 +32,8 @@ def scan(path, json_output=False, out_file=None):
     
     return (output_set, complete_advisory)
 
-
-
-if __name__ == "__main__":
-    parser = custom_parser.Parser()
+def run_app():
+    parser = Parser()
 
     parser.add_argument(
         '-p',
@@ -62,3 +60,6 @@ if __name__ == "__main__":
             scan(path='.', out_file=args.out_file)
         else:
             scan(path='.')
+
+if __name__ == "__main__":
+    run_app()
