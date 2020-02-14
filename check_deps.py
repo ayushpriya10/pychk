@@ -80,6 +80,10 @@ def check_dependency(dep_name, dep_version=''):
         
         while None in full_output[dep_name]:
             full_output[dep_name].remove(None)
+    
+    for vuln_dep in full_output.keys():
+        if full_output[vuln_dep] == []:
+            del full_output[vuln_dep]
 
     if full_output == {}:
         return (output_set, None)
