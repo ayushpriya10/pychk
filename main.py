@@ -30,7 +30,7 @@ def scan(path, json_output=False, out_file=None):
     else:
         pprint.pprint(complete_advisory)
     
-    return complete_advisory
+    return (output_set, complete_advisory)
 
 
 

@@ -14,9 +14,33 @@ def find_advisory(dep_name, version):
                 'vulnerable versions': version
             }
 
+def compare_versions(vuln_ver, dep_version):
+    if '<' in vuln_ver and '=' not in vuln_ver:
+        if version.parse(dep_version) < version.parse(vuln_ver[1:]):
+            return True
+
+    if '<=' in vuln_ver:
+        if version.parse(dep_version) <= version.parse(vuln_ver[2:]):
+            return True
+    
+    if '>' in vuln_ver and '=' not in vuln_ver:
+        if version.parse(dep_version) > version.parse(vuln_ver[1:]):
+            return True
+    
+    if '>=' in vuln_ver:
+        if version.parse(dep_version) >= version.parse(vuln_ver[2:]):
+            return True
+    
+    if '==' in vuln_ver:
+        if version.parse(dep_version) == version.parse(vuln_ver[2:]):
+            return True
+    
+    return False
+
 def check_dependency(dep_name, dep_version=''):
 
-    '''ADVISORY STRUCTURE:
+    '''
+    ADVISORY STRUCTURE:
         [
             {
                 'Dependency Name':[
@@ -48,51 +72,31 @@ def check_dependency(dep_name, dep_version=''):
             ver_list = [i.strip() for i in ver.split(',')]
 
             for vuln_ver in ver_list:
-                if '<' in vuln_ver and '=' not in vuln_ver:
-                    if version.parse(dep_version) < version.parse(vuln_ver[1:]):
+
+                if len(ver_list) != 2:
+                    if compare_versions(vuln_ver, dep_version):
                         output_set.add((dep_name, dep_version, vuln_ver))
                         advisory = find_advisory(dep_name, ver)
                         full_output[dep_name] += [advisory]
 
-                if '<=' in vuln_ver:
-                    if version.parse(dep_version) <= version.parse(vuln_ver[2:]):
+                if len(ver_list) == 2:
+                    if compare_versions(ver_list[0], dep_version) and compare_versions(ver_list[1], dep_version):
                         output_set.add((dep_name, dep_version, vuln_ver))
                         advisory = find_advisory(dep_name, ver)
                         full_output[dep_name] += [advisory]
-                
-                if '>' in vuln_ver and '=' not in vuln_ver:
-                    if version.parse(dep_version) > version.parse(vuln_ver[1:]):
-                        output_set.add((dep_name, dep_version, vuln_ver))
-                        advisory = find_advisory(dep_name, ver)
-                        full_output[dep_name] += [advisory]
-                
-                if '>=' in vuln_ver:
-                    if version.parse(dep_version) >= version.parse(vuln_ver[2:]):
-                        output_set.add((dep_name, dep_version, vuln_ver))
-                        advisory = find_advisory(dep_name, ver)
-                        full_output[dep_name] += [advisory]
-                
-                if '==' in vuln_ver:
-                    if version.parse(dep_version) == version.parse(vuln_ver[2:]):
-                        output_set.add((dep_name, dep_version, vuln_ver))
-                        advisory = find_advisory(dep_name, ver)
-                        full_output[dep_name] += [advisory]
+                        break
         
         while None in full_output[dep_name]:
             full_output[dep_name].remove(None)
     
-    for vuln_dep in full_output.keys():
-        if full_output[vuln_dep] == []:
-            del full_output[vuln_dep]
-
-    if full_output == {}:
+    if full_output == {} or full_output[dep_name] == []:
         return (output_set, None)
 
     return (output_set, full_output)
 
 
 if __name__ == "__main__":
-    
+
     # '<' type versions
     check_dependency('aiohttp', '0.16.1') #True
     check_dependency('aiohttp', '0.16.3') #False
@@ -124,3 +128,6 @@ if __name__ == "__main__":
 
     # Breaking cases
     check_dependency('Random Package')
+
+    # Functional Testing for compare_version()
+    print(compare_versions('>=2.1', '2.4.0'), compare_versions('<=2.5.3', '2.4.0')) # True, True
